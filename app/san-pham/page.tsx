@@ -1,6 +1,7 @@
 "use client";
 import { ISanPham } from "../lib/cautrucdata";
 import Link from "next/link";
+import Image from "next/image";
 import NutXoaSP from "./NutXoaSP";
 import { useEffect, useState } from "react";
 import {
@@ -133,23 +134,16 @@ export default function ProductList() {
                       {Number(sp.gia).toLocaleString("vi")} VNĐ
                     </td>
                     <td className="py-3 px-4">
-                      {sp.hinh ? (
-                        <img
-                          src={sp.hinh}
-                          width={50}
-                          height={50}
-                          className="rounded"
-                          alt={sp.ten_sp}
+                      <div className="relative w-[50px] h-[50px]">
+                        <Image
+                          src={sp.hinh || "/placeholder.png"}
+                          fill
+                          className="rounded object-cover"
+                          alt={sp.ten_sp || "Không có hình"}
+                          sizes="50px"
+                          quality={80}
                         />
-                      ) : (
-                        <img
-                          src="/placeholder.png"
-                          width={50}
-                          height={50}
-                          className="rounded opacity-50"
-                          alt="Không có hình"
-                        />
-                      )}
+                      </div>
                     </td>
                     <td className="py-3 px-4">
                       {new Date(sp.ngay).toLocaleDateString("vi", {

@@ -23,7 +23,6 @@ export async function GET(
       ten: string;
       vai_tro: number;
       khoa: number;
-      // thêm các trường khác nếu có
     };
 
     const userFormatted = {
@@ -33,8 +32,13 @@ export async function GET(
     };
 
     return NextResponse.json(userFormatted);
-  } catch (error: any) {
-    console.error("Lỗi khi lấy người dùng:", error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Lỗi khi lấy người dùng:", error.message);
+    } else {
+      console.error("Lỗi không xác định khi lấy người dùng:", error);
+    }
+
     return NextResponse.json(
       { message: "Lỗi máy chủ nội bộ" },
       { status: 500 }
@@ -52,7 +56,6 @@ export async function PUT(
     const body = await req.json();
     let { vai_tro } = body;
 
-    // Convert string role to integer
     if (vai_tro === "admin") {
       vai_tro = 1;
     } else if (vai_tro === "user") {
@@ -79,8 +82,13 @@ export async function PUT(
       { message: "Cập nhật vai trò người dùng thành công" },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Lỗi cập nhật người dùng:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Lỗi cập nhật người dùng:", error.message);
+    } else {
+      console.error("Lỗi không xác định khi cập nhật người dùng:", error);
+    }
+
     return NextResponse.json(
       { message: "Lỗi máy chủ nội bộ" },
       { status: 500 }

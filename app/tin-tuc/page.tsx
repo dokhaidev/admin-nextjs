@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import NutXoaTin from "./NutXoaTin";
+import Image from "next/image";
 
 export default function TinTucList() {
   const [danhSachTin, setDanhSachTin] = useState<ITinTuc[]>([]);
@@ -40,7 +41,7 @@ export default function TinTucList() {
       }
     };
     taiTin();
-  }, [trangHienTai]);
+  }, [trangHienTai, soTinTrenTrang]);
 
   const handleDeleteSuccess = (deletedId: number) => {
     setDanhSachTin((prev) => prev.filter((sp) => sp.id !== deletedId));
@@ -50,23 +51,6 @@ export default function TinTucList() {
   const chuyenTrang = (trangMoi: number) => {
     if (trangMoi >= 1 && trangMoi <= tongSoTrang) {
       setTrangHienTai(trangMoi);
-    }
-  };
-
-  const handleXoaTin = async (id: number) => {
-    if (!confirm("Bạn có chắc muốn xóa tin này không?")) return;
-    try {
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3003"
-        }/api/tin-tuc/${id}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) throw new Error("Xóa tin thất bại");
-      toast.success("Đã xóa tin thành công");
-      setDanhSachTin((prev) => prev.filter((tin) => tin.id !== id));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Lỗi khi xóa tin");
     }
   };
 
@@ -122,7 +106,13 @@ export default function TinTucList() {
                     {new Date(tin.ngay).toLocaleDateString("vi")}
                   </td>
                   <td className="px-4 py-3">
-                    <img src={tin.hinh} alt="" className="w-12 h-12 rounded" />
+                    <Image
+                      src={tin.hinh}
+                      alt="Tin tức"
+                      width={48}
+                      height={48}
+                      className="rounded object-cover"
+                    />
                   </td>
                   <td className="px-4 py-3">
                     {tin.an_hien ? (
@@ -172,7 +162,6 @@ export default function TinTucList() {
         </table>
       </div>
 
-      {/* Phân trang */}
       {tongSoTrang > 1 && (
         <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex justify-between sm:hidden">

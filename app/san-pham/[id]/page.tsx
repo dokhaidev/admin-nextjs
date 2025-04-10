@@ -6,9 +6,10 @@ import { useState, useEffect, use } from "react";
 import { FiSave, FiArrowLeft, FiEye, FiEyeOff, FiStar } from "react-icons/fi";
 import { toast } from "react-toastify";
 import UploadImage from "../UploadImage";
+import Image from "next/image";
 
 export default function SuaSP(props: { params: Promise<{ id: string }> }) {
-  const { id } = use(props.params); // ✅ unwrap Promise
+  const { id } = use(props.params);
   const numericId = Number(id);
   const router = useRouter();
 
@@ -23,7 +24,7 @@ export default function SuaSP(props: { params: Promise<{ id: string }> }) {
         const resLoai = await fetch(`/api/loai`);
         if (!resLoai.ok) throw new Error("Không thể tải danh sách loại");
         const loaiData = await resLoai.json();
-        setLoaiArr(loaiData.data); // ✅ FIXED
+        setLoaiArr(loaiData.data);
 
         const resSP = await fetch(`/api/san-pham/${numericId}`);
         if (resSP.status === 404) throw new Error("Sản phẩm không tồn tại");
@@ -84,7 +85,6 @@ export default function SuaSP(props: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header */}
       <div className="bg-gradient-to-r from-orange-400 to-orange-500 p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">Chỉnh sửa sản phẩm</h1>
@@ -97,7 +97,6 @@ export default function SuaSP(props: { params: Promise<{ id: string }> }) {
         </div>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Cột 1 */}
@@ -127,9 +126,11 @@ export default function SuaSP(props: { params: Promise<{ id: string }> }) {
               />
               {sanPham.hinh && (
                 <div className="mt-2">
-                  <img
+                  <Image
                     src={sanPham.hinh}
                     alt="Preview"
+                    width={160}
+                    height={160}
                     className="h-40 object-contain border rounded"
                   />
                 </div>

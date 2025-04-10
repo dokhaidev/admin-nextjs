@@ -5,6 +5,7 @@ import { useState, useEffect, use } from "react";
 import { FiSave, FiArrowLeft, FiEye, FiEyeOff, FiStar } from "react-icons/fi";
 import { toast } from "react-toastify";
 import UploadImage from "../UploadImage";
+import Image from "next/image"; // ✅ Import Image của Next.js
 
 interface ITinTuc {
   id: number;
@@ -124,11 +125,13 @@ export default function SuaTinTuc(props: { params: Promise<{ id: string }> }) {
               }}
             />
             {tinTuc.hinh && (
-              <div className="mt-2">
-                <img
+              <div className="mt-2 relative h-40 w-full max-w-xs">
+                <Image
                   src={tinTuc.hinh}
                   alt="Hình minh họa"
-                  className="h-40 object-contain border rounded"
+                  layout="fill"
+                  objectFit="contain"
+                  className="border rounded"
                 />
               </div>
             )}

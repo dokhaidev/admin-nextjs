@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 interface UploadImageProps {
   name: string;
@@ -53,11 +54,14 @@ export default function UploadImage({ name, onUploaded }: UploadImageProps) {
         className="border p-2 w-full"
       />
       {image && (
-        <img
-          src={image}
-          alt="Hình ảnh đã upload"
-          className="w-32 h-32 mt-2 object-cover border rounded"
-        />
+        <div className="w-32 h-32 mt-2 relative border rounded overflow-hidden">
+          <Image
+            src={image}
+            alt="Hình ảnh đã upload"
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
       )}
       {/* Input hidden để lưu URL nếu cần submit form */}
       <input type="hidden" name={name} />

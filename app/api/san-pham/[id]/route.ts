@@ -30,18 +30,15 @@ export async function GET(
   return NextResponse.json(sp);
 }
 
-// ✅ Giữ lại POST nếu bạn dùng cho mục đích khác
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// POST không sử dụng ở đây
+export async function POST() {
   return NextResponse.json(
     { message: "POST không dùng để cập nhật ở đây" },
     { status: 405 }
   );
 }
 
-// ✅ Thêm mới hàm PUT để cập nhật sản phẩm
+// Cập nhật sản phẩm
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
