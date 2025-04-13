@@ -225,7 +225,7 @@ export default function TinTucList() {
                 <FiChevronLeft className="h-5 w-5" />
               </button>
               {Array.from({ length: Math.min(5, tongSoTrang) }, (_, i) => {
-                let pageNum =
+                const pageNum =
                   tongSoTrang <= 5
                     ? i + 1
                     : trangHienTai <= 3

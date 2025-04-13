@@ -76,7 +76,7 @@ function StatCard({
 // Main Dashboard
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  // const router = useRouter();
   const [stats, setStats] = useState({
     categories: { total: 0, visible: 0, hidden: 0 },
     products: { total: 0, visible: 0, hidden: 0, hot: 0 },
