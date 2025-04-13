@@ -37,8 +37,9 @@ export interface ITinTuc {
 
 export interface IUser {
   id: number;
-  ho_ten: string;
   email: string;
-  vai_tro: string; // admin | user
-  trang_thai: boolean;
+  mat_khau: string;
+  ho_ten: string;
+  vai_tro: number; // 0: user, 1: admin
+  khoa: number; // 0: hoạt động, 1: bị khóa
 }

@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Component LoadingSpinner
 function LoadingSpinner() {
@@ -74,6 +75,8 @@ function StatCard({
 
 // Main Dashboard
 export default function Dashboard() {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [stats, setStats] = useState({
     categories: { total: 0, visible: 0, hidden: 0 },
     products: { total: 0, visible: 0, hidden: 0, hot: 0 },
@@ -82,8 +85,8 @@ export default function Dashboard() {
     orders: 0,
     revenue: 0,
   });
-  const [loading, setLoading] = useState(true);
 
+  // Gọi API thống kê
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
@@ -116,7 +119,7 @@ export default function Dashboard() {
             visible: newsData.visible || 0,
             hidden: newsData.hidden || 0,
           },
-          users: 0, // chưa có dữ liệu từ API
+          users: 0,
           orders: 0,
           revenue: 0,
         });
@@ -135,9 +138,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 p-4">
-      <h1 className="text-2xl font-bold">Tổng quan hệ thống</h1>
-
-      {/* Tổng quan */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Tổng sản phẩm"
@@ -173,9 +173,7 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Chi tiết */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Danh mục */}
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold flex items-center">
@@ -213,7 +211,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Sản phẩm */}
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold flex items-center">
@@ -260,7 +257,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Người dùng - Đơn hàng */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatCard
           title="Người dùng"

@@ -69,8 +69,8 @@ export const UserModel = db.define(
     ho_ten: { type: DataTypes.STRING, allowNull: false },
     vai_tro: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }, // 1: admin, 0: user
     khoa: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }, // 1: khóa, 0: hoạt động
-    remember_token: { type: DataTypes.STRING, allowNull: true },
-    email_verified_at: { type: DataTypes.DATE, allowNull: true },
+    // remember_token: { type: DataTypes.STRING, allowNull: true },
+    // email_verified_at: { type: DataTypes.DATE, allowNull: true },
   },
   {
     tableName: "users",

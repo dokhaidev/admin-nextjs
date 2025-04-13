@@ -1,8 +1,10 @@
 "use client";
+
 import { FiSearch, FiBell, FiSettings, FiMenu, FiLogOut } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function Header({
   toggleSidebar,
@@ -11,10 +13,42 @@ export default function Header({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Ẩn header trên trang login nếu cần
-  if (pathname === "/login") return null;
+  useEffect(() => {
+    // Chỉ thực thi sau khi client đã mount
+    setIsMounted(true);
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        const parsed = JSON.parse(user);
+        setUserName(parsed.ho_ten || "Admin");
+      } catch (err) {
+        console.error("Lỗi parse user:", err);
+        setUserName("Admin");
+      }
+    } else {
+      setUserName("Admin");
+    }
+  }, []);
+
+  // Không render gì khi chưa mount hoặc đang ở trang login
+  if (!isMounted || pathname === "/login") return null;
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout");
+      localStorage.removeItem("user");
+      toast.success("Đăng xuất thành công!");
+      router.replace("/login");
+    } catch (err) {
+      toast.error("Lỗi khi đăng xuất!");
+      console.error("Logout error:", err);
+    }
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-30">
@@ -67,7 +101,7 @@ export default function Header({
             >
               <FaUserCircle className="text-2xl text-gray-600" />
               <span className="hidden md:inline-block text-gray-700">
-                Admin
+                {userName}
               </span>
             </button>
 
@@ -85,12 +119,12 @@ export default function Header({
                 >
                   <FiSettings className="mr-2" /> Cài đặt
                 </a>
-                <a
-                  href="/login"
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                 >
                   <FiLogOut className="mr-2" /> Đăng xuất
-                </a>
+                </button>
               </div>
             )}
           </div>

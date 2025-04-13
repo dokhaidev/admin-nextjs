@@ -1,4 +1,6 @@
 "use client";
+
+import { useRouter } from "next/navigation";
 import { ISanPham } from "../lib/cautrucdata";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,6 +18,7 @@ import {
 import { toast } from "react-toastify";
 
 export default function ProductList() {
+  const router = useRouter();
   const [danhSachSP, setDanhSachSP] = useState<ISanPham[]>([]);
   const [dangTai, setDangTai] = useState(true);
   const [loi, setLoi] = useState<string | null>(null);

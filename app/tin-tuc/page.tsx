@@ -1,4 +1,5 @@
 "use client";
+
 import { ITinTuc } from "../lib/cautrucdata";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -26,9 +27,11 @@ export default function TinTucList() {
   useEffect(() => {
     const taiTin = async () => {
       try {
-        const url = `${
-          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3003"
-        }/api/tin-tuc?page=${trangHienTai}&limit=${soTinTrenTrang}`;
+        // Xác định baseURL an toàn
+        const baseURL =
+          process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3003";
+        const url = `${baseURL}/api/tin-tuc?page=${trangHienTai}&limit=${soTinTrenTrang}`;
+
         const res = await fetch(url);
         if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
         const data = await res.json();
@@ -40,12 +43,13 @@ export default function TinTucList() {
         setDangTai(false);
       }
     };
+
     taiTin();
   }, [trangHienTai, soTinTrenTrang]);
 
   const handleDeleteSuccess = (deletedId: number) => {
     setDanhSachTin((prev) => prev.filter((sp) => sp.id !== deletedId));
-    toast.success("Xóa sản phẩm thành công!");
+    toast.success("Xóa tin tức thành công!");
   };
 
   const chuyenTrang = (trangMoi: number) => {
@@ -107,7 +111,9 @@ export default function TinTucList() {
                   </td>
                   <td className="px-4 py-3">
                     <Image
-                      src={tin.hinh}
+                      src={
+                        tin.hinh.startsWith("http") ? tin.hinh : `/${tin.hinh}`
+                      }
                       alt="Tin tức"
                       width={48}
                       height={48}
@@ -182,89 +188,81 @@ export default function TinTucList() {
           </div>
 
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Hiển thị{" "}
-                <span className="font-medium">
-                  {(trangHienTai - 1) * soTinTrenTrang + 1}
-                </span>{" "}
-                đến{" "}
-                <span className="font-medium">
-                  {Math.min(
-                    trangHienTai * soTinTrenTrang,
-                    tongSoTrang * soTinTrenTrang
-                  )}
-                </span>{" "}
-                trong tổng số{" "}
-                <span className="font-medium">
-                  {tongSoTrang * soTinTrenTrang}
-                </span>{" "}
-                kết quả
-              </p>
-            </div>
-            <div>
-              <nav
-                className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                aria-label="Pagination"
+            <p className="text-sm text-gray-700">
+              Hiển thị{" "}
+              <span className="font-medium">
+                {(trangHienTai - 1) * soTinTrenTrang + 1}
+              </span>{" "}
+              đến{" "}
+              <span className="font-medium">
+                {Math.min(
+                  trangHienTai * soTinTrenTrang,
+                  tongSoTrang * soTinTrenTrang
+                )}
+              </span>{" "}
+              trong tổng số{" "}
+              <span className="font-medium">
+                {tongSoTrang * soTinTrenTrang}
+              </span>{" "}
+              kết quả
+            </p>
+            <nav
+              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              aria-label="Pagination"
+            >
+              <button
+                onClick={() => chuyenTrang(1)}
+                disabled={trangHienTai === 1}
+                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <button
-                  onClick={() => chuyenTrang(1)}
-                  disabled={trangHienTai === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  ⏮
-                </button>
-                <button
-                  onClick={() => chuyenTrang(trangHienTai - 1)}
-                  disabled={trangHienTai === 1}
-                  className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FiChevronLeft className="h-5 w-5" />
-                </button>
+                ⏮
+              </button>
+              <button
+                onClick={() => chuyenTrang(trangHienTai - 1)}
+                disabled={trangHienTai === 1}
+                className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FiChevronLeft className="h-5 w-5" />
+              </button>
+              {Array.from({ length: Math.min(5, tongSoTrang) }, (_, i) => {
+                let pageNum =
+                  tongSoTrang <= 5
+                    ? i + 1
+                    : trangHienTai <= 3
+                    ? i + 1
+                    : trangHienTai >= tongSoTrang - 2
+                    ? tongSoTrang - 4 + i
+                    : trangHienTai - 2 + i;
 
-                {Array.from({ length: Math.min(5, tongSoTrang) }, (_, i) => {
-                  let pageNum;
-                  if (tongSoTrang <= 5) {
-                    pageNum = i + 1;
-                  } else if (trangHienTai <= 3) {
-                    pageNum = i + 1;
-                  } else if (trangHienTai >= tongSoTrang - 2) {
-                    pageNum = tongSoTrang - 4 + i;
-                  } else {
-                    pageNum = trangHienTai - 2 + i;
-                  }
-
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => chuyenTrang(pageNum)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        trangHienTai === pageNum
-                          ? "bg-blue-50 border-blue-500 text-blue-600 z-10"
-                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
-
-                <button
-                  onClick={() => chuyenTrang(trangHienTai + 1)}
-                  disabled={trangHienTai === tongSoTrang}
-                  className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FiChevronRight className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => chuyenTrang(tongSoTrang)}
-                  disabled={trangHienTai === tongSoTrang}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  ⏭
-                </button>
-              </nav>
-            </div>
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => chuyenTrang(pageNum)}
+                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                      trangHienTai === pageNum
+                        ? "bg-blue-50 border-blue-500 text-blue-600 z-10"
+                        : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => chuyenTrang(trangHienTai + 1)}
+                disabled={trangHienTai === tongSoTrang}
+                className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FiChevronRight className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => chuyenTrang(tongSoTrang)}
+                disabled={trangHienTai === tongSoTrang}
+                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ⏭
+              </button>
+            </nav>
           </div>
         </div>
       )}
