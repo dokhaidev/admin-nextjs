@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, use } from "react";
 import { FiSave, FiArrowLeft, FiEye, FiEyeOff, FiStar } from "react-icons/fi";
 import { toast } from "react-toastify";
-import UploadImage from "../UploadImage";
-import Image from "next/image"; // ✅ Import Image của Next.js
 
 interface ITinTuc {
   id: number;
@@ -18,8 +16,13 @@ interface ITinTuc {
   hot: boolean;
 }
 
-export default function SuaTinTuc(props: { params: Promise<{ id: string }> }) {
-  const { id } = use(props.params);
+export default function SuaTinTuc({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // Unwrap params với React.use()
+  const { id } = use(params);
   const numericId = Number(id);
   const router = useRouter();
 
@@ -116,47 +119,12 @@ export default function SuaTinTuc(props: { params: Promise<{ id: string }> }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Hình ảnh
-            </label>
-            <UploadImage
-              name="hinh"
-              onUploaded={(url) => {
-                setTinTuc((prev) => (prev ? { ...prev, hinh: url } : prev));
-              }}
-            />
-            {tinTuc.hinh && (
-              <div className="mt-2 relative h-40 w-full max-w-xs">
-                <Image
-                  src={tinTuc.hinh}
-                  alt="Hình minh họa"
-                  layout="fill"
-                  objectFit="contain"
-                  className="border rounded"
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
               Ngày đăng
             </label>
             <input
               type="date"
               name="ngay"
               defaultValue={tinTuc.ngay}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Tóm tắt
-            </label>
-            <textarea
-              name="tom_tat"
-              defaultValue={tinTuc.tom_tat}
-              rows={3}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
             />
           </div>

@@ -30,10 +30,12 @@ export default function NutXoaSP({ id, onDeleteSuccess }: NutXoaSPProps) {
 
       toast.success("Xóa sản phẩm thành công!");
 
+      // Execute the onDeleteSuccess callback if it's provided
       if (onDeleteSuccess) {
         onDeleteSuccess(id);
       }
 
+      // Refresh the page (or the part of the page that requires update)
       router.refresh();
     } catch (error) {
       console.error("Lỗi khi xóa sản phẩm:", error);

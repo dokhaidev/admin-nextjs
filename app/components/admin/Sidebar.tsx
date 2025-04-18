@@ -6,7 +6,6 @@ import {
   FiList,
   FiUsers,
   FiShoppingCart,
-  FiBarChart2,
   FiHome,
   FiFileText,
   FiLogOut,
@@ -45,21 +44,11 @@ export default function Sidebar({
       name: "Người dùng",
       path: "/users",
       icon: <FiUsers className="text-lg" />,
-      submenu: [
-        { name: "Danh sách", path: "/admin/users" },
-        { name: "Thêm mới", path: "/admin/users/new" },
-        { name: "Phân quyền", path: "/admin/users/roles" },
-      ],
     },
     {
       name: "Đơn hàng",
-      path: "/admin/orders",
+      path: "/orders",
       icon: <FiShoppingCart className="text-lg" />,
-    },
-    {
-      name: "Báo cáo",
-      path: "/admin/reports",
-      icon: <FiBarChart2 className="text-lg" />,
     },
     {
       name: "Bài viết",

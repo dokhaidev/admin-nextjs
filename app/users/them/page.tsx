@@ -2,39 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  FiSave,
-  FiArrowLeft,
-  FiAlertCircle,
-  FiEyeOff,
-  FiEye,
-} from "react-icons/fi";
+import { FiSave, FiArrowLeft, FiAlertCircle } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 interface FormErrors {
-  tieu_de?: string;
-  mo_ta?: string;
-  ngay?: string;
-  noi_dung?: string;
+  email?: string;
+  mat_khau?: string;
+  ho_ten?: string;
 }
 
-export default function ThemTin() {
+export default function ThemUser() {
   const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
   const validateForm = (formData: FormData) => {
     const newErrors: FormErrors = {};
-    const tieu_de = formData.get("tieu_de")?.toString().trim();
-    const ngay = formData.get("ngay")?.toString();
-    const mo_ta = formData.get("mo_ta")?.toString().trim();
-    const noi_dung = formData.get("noi_dung")?.toString().trim();
+    const email = formData.get("email")?.toString().trim();
+    const mat_khau = formData.get("mat_khau")?.toString();
+    const ho_ten = formData.get("ho_ten")?.toString().trim();
 
-    if (!tieu_de) newErrors.tieu_de = "Tiêu đề là bắt buộc";
-    if (!ngay) newErrors.ngay = "Ngày đăng là bắt buộc";
-    else if (new Date(ngay) > new Date()) newErrors.ngay = "Ngày không hợp lệ";
-    if (!mo_ta) newErrors.mo_ta = "Mô tả là bắt buộc";
-    if (!noi_dung) newErrors.noi_dung = "Nội dung là bắt buộc";
+    if (!email || !/\S+@\S+\.\S+/.test(email))
+      newErrors.email = "Email không hợp lệ";
+    if (!mat_khau) newErrors.mat_khau = "Mật khẩu là bắt buộc";
+    if (!ho_ten) newErrors.ho_ten = "Họ tên là bắt buộc";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -47,16 +38,16 @@ export default function ThemTin() {
     if (!validateForm(formData)) return;
 
     const data = {
-      tieu_de: formData.get("tieu_de"),
-      ngay: formData.get("ngay"),
-      mo_ta: formData.get("mo_ta"),
-      noi_dung: formData.get("noi_dung"),
-      an_hien: formData.get("an_hien"),
+      email: formData.get("email"),
+      mat_khau: formData.get("mat_khau"),
+      ho_ten: formData.get("ho_ten"),
+      vai_tro: formData.get("vai_tro"),
+      khoa: formData.get("khoa"),
     };
 
     setSubmitting(true);
     try {
-      const response = await fetch("/api/tin-tuc", {
+      const response = await fetch("/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Gửi JSON
@@ -66,14 +57,14 @@ export default function ThemTin() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Thêm tin thất bại");
+        throw new Error(errorData.message || "Thêm người dùng thất bại");
       }
 
-      toast.success("Thêm tin thành công!");
-      router.push("/tin-tuc");
+      toast.success("Thêm người dùng thành công!");
+      router.push("/users"); // Điều hướng đến trang danh sách người dùng
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Lỗi khi thêm tin tức"
+        error instanceof Error ? error.message : "Lỗi khi thêm người dùng"
       );
     } finally {
       setSubmitting(false);
@@ -84,7 +75,7 @@ export default function ThemTin() {
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="bg-gradient-to-r from-orange-400 to-orange-500 p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">Thêm tin tức mới</h1>
+          <h1 className="text-xl font-bold text-white">Thêm người dùng mới</h1>
           <button
             onClick={() => router.back()}
             className="text-white hover:text-gray-100 flex items-center gap-1 text-sm"
@@ -95,98 +86,92 @@ export default function ThemTin() {
       </div>
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         <div className="grid grid-cols-1 gap-6">
-          {/* Tiêu đề */}
+          {/* Email */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Tiêu đề *
+              Email *
+            </label>
+            <input
+              type="email"
+              name="email"
+              className={`block w-full px-3 py-2 border ${
+                errors.email ? "border-red-300" : "border-gray-300"
+              } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500`}
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600 flex items-center">
+                <FiAlertCircle className="mr-1" />
+                {errors.email}
+              </p>
+            )}
+          </div>
+
+          {/* Họ tên */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Họ tên *
             </label>
             <input
               type="text"
-              name="tieu_de"
+              name="ho_ten"
               className={`block w-full px-3 py-2 border ${
-                errors.tieu_de ? "border-red-300" : "border-gray-300"
+                errors.ho_ten ? "border-red-300" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500`}
             />
-            {errors.tieu_de && (
+            {errors.ho_ten && (
               <p className="mt-1 text-sm text-red-600 flex items-center">
                 <FiAlertCircle className="mr-1" />
-                {errors.tieu_de}
+                {errors.ho_ten}
               </p>
             )}
           </div>
 
-          {/* Ngày đăng */}
+          {/* Mật khẩu */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Ngày đăng *
+              Mật khẩu *
             </label>
             <input
-              type="date"
-              name="ngay"
+              type="password"
+              name="mat_khau"
               className={`block w-full px-3 py-2 border ${
-                errors.ngay ? "border-red-300" : "border-gray-300"
+                errors.mat_khau ? "border-red-300" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500`}
             />
-            {errors.ngay && (
+            {errors.mat_khau && (
               <p className="mt-1 text-sm text-red-600 flex items-center">
                 <FiAlertCircle className="mr-1" />
-                {errors.ngay}
+                {errors.mat_khau}
               </p>
             )}
           </div>
 
-          {/* Nội dung chi tiết */}
+          {/* Vai trò */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Nội dung chi tiết *
+              Vai trò *
             </label>
-            <textarea
-              name="noi_dung"
-              rows={6}
-              className={`block w-full px-3 py-2 border ${
-                errors.noi_dung ? "border-red-300" : "border-gray-300"
-              } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500`}
-            />
-            {errors.noi_dung && (
-              <p className="mt-1 text-sm text-red-600 flex items-center">
-                <FiAlertCircle className="mr-1" />
-                {errors.noi_dung}
-              </p>
-            )}
+            <select
+              name="vai_tro"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value={1}>Admin</option>
+              <option value={0}>User</option>
+            </select>
           </div>
 
           {/* Trạng thái */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Trạng thái *
-              </label>
-              <div className="flex items-center space-x-6">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="an_hien"
-                    value="1"
-                    defaultChecked
-                    className="h-4 w-4 text-orange-600 border-gray-300"
-                  />
-                  <span className="ml-2 text-gray-700 inline-flex items-center">
-                    <FiEye className="mr-1" /> Hiển thị
-                  </span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="an_hien"
-                    value="0"
-                    className="h-4 w-4 text-orange-600 border-gray-300"
-                  />
-                  <span className="ml-2 text-gray-700 inline-flex items-center">
-                    <FiEyeOff className="mr-1" /> Ẩn
-                  </span>
-                </label>
-              </div>
-            </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Trạng thái *
+            </label>
+            <select
+              name="khoa"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value={0}>Hoạt động</option>
+              <option value={1}>Khóa</option>
+            </select>
           </div>
         </div>
 
@@ -205,7 +190,7 @@ export default function ThemTin() {
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50"
           >
             <FiSave className="mr-2" />
-            {submitting ? "Đang thêm..." : "Thêm tin tức"}
+            {submitting ? "Đang thêm..." : "Thêm người dùng"}
           </button>
         </div>
       </form>

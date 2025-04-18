@@ -14,7 +14,6 @@ import {
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import NutXoaTin from "./NutXoaTin";
-import Image from "next/image";
 
 export default function TinTucList() {
   const [danhSachTin, setDanhSachTin] = useState<ITinTuc[]>([]);
@@ -94,7 +93,6 @@ export default function TinTucList() {
               <th className="px-4 py-3 text-left">ID</th>
               <th className="px-4 py-3 text-left">Tiêu đề</th>
               <th className="px-4 py-3 text-left">Ngày</th>
-              <th className="px-4 py-3 text-left">Hình</th>
               <th className="px-4 py-3 text-left">Hiện</th>
               <th className="px-4 py-3 text-left">Hot</th>
               <th className="px-4 py-3 text-left">Hành động</th>
@@ -108,17 +106,6 @@ export default function TinTucList() {
                   <td className="px-4 py-3">{tin.tieu_de}</td>
                   <td className="px-4 py-3">
                     {new Date(tin.ngay).toLocaleDateString("vi")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Image
-                      src={
-                        tin.hinh.startsWith("http") ? tin.hinh : `/${tin.hinh}`
-                      }
-                      alt="Tin tức"
-                      width={48}
-                      height={48}
-                      className="rounded object-cover"
-                    />
                   </td>
                   <td className="px-4 py-3">
                     {tin.an_hien ? (
@@ -159,7 +146,7 @@ export default function TinTucList() {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="text-center py-4 text-gray-500">
+                <td colSpan={6} className="text-center py-4 text-gray-500">
                   Không có tin tức
                 </td>
               </tr>

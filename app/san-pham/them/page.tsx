@@ -107,6 +107,9 @@ export default function ThemSP() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    // Set hình vào formData
+    formData.set("hinh", hinh);
+
     if (!validateForm(formData)) return;
 
     setSubmitting(true);
@@ -180,7 +183,6 @@ export default function ThemSP() {
                 name="hinh"
                 onUploaded={(url: string) => setHinh(url)}
               />
-              <input type="hidden" name="hinh" value={hinh} />
               {errors.hinh && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
                   <FiAlertCircle className="mr-1" />
@@ -332,21 +334,26 @@ export default function ThemSP() {
             </div>
           </div>
         </div>
-        <div className="flex justify-end space-x-3 pt-4">
+        <div className="space-x-4 flex justify-end">
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md shadow-sm hover:bg-gray-300"
           >
-            Hủy bỏ
+            Hủy
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md shadow-sm hover:bg-orange-700 disabled:opacity-50"
           >
-            <FiSave className="mr-2" />
-            {submitting ? "Đang thêm..." : "Thêm sản phẩm"}
+            {submitting ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+            ) : (
+              <>
+                <FiSave className="mr-2" /> Lưu
+              </>
+            )}
           </button>
         </div>
       </form>

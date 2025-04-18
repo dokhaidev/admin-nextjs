@@ -20,7 +20,8 @@ export async function GET(
     const userData = user.toJSON() as {
       id: string;
       email: string;
-      ten: string;
+      mat_khau: string;
+      ho_ten: string;
       vai_tro: number;
       khoa: number;
     };
@@ -28,17 +29,15 @@ export async function GET(
     const userFormatted = {
       ...userData,
       vai_tro: userData.vai_tro === 1 ? "admin" : "user",
-      trang_thai: userData.khoa === 0,
+      trang_thai: userData.khoa === 0, // 0 là hoạt động, 1 là khóa
     };
 
     return NextResponse.json(userFormatted);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Lỗi khi lấy người dùng:", error.message);
-    } else {
-      console.error("Lỗi không xác định khi lấy người dùng:", error);
-    }
-
+    console.error(
+      "Lỗi khi lấy người dùng:",
+      error instanceof Error ? error.message : error
+    );
     return NextResponse.json(
       { message: "Lỗi máy chủ nội bộ" },
       { status: 500 }
@@ -46,7 +45,7 @@ export async function GET(
   }
 }
 
-// PUT: Cập nhật vai trò người dùng
+// PUT: Cập nhật thông tin người dùng
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
@@ -54,15 +53,30 @@ export async function PUT(
   try {
     const { id } = params;
     const body = await req.json();
-    let { vai_tro } = body;
+    const { vai_tro, khoa } = body; // Changed to const
 
-    if (vai_tro === "admin") {
-      vai_tro = 1;
-    } else if (vai_tro === "user") {
-      vai_tro = 0;
+    // Kiểm tra và chuyển đổi vai_tro
+    let vai_troUpdated = vai_tro; // Use a separate variable if needed
+
+    if (vai_troUpdated) {
+      vai_troUpdated = vai_troUpdated.toLowerCase();
+    }
+
+    if (vai_troUpdated === "admin") {
+      vai_troUpdated = 1;
+    } else if (vai_troUpdated === "user") {
+      vai_troUpdated = 0;
     } else {
       return NextResponse.json(
         { message: "Giá trị vai_tro không hợp lệ" },
+        { status: 400 }
+      );
+    }
+
+    // Kiểm tra giá trị khoa (khoa phải là boolean)
+    if (typeof khoa !== "boolean") {
+      return NextResponse.json(
+        { message: "Giá trị khoa không hợp lệ" },
         { status: 400 }
       );
     }
@@ -76,19 +90,27 @@ export async function PUT(
       );
     }
 
-    await user.update({ vai_tro });
+    const updated = await user.update({
+      vai_tro: vai_troUpdated,
+      khoa: khoa ? 1 : 0, // 1 là bị khóa, 0 là hoạt động
+    });
 
-    return NextResponse.json(
-      { message: "Cập nhật vai trò người dùng thành công" },
-      { status: 200 }
-    );
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Lỗi cập nhật người dùng:", error.message);
+    if (updated) {
+      return NextResponse.json(
+        { message: "Cập nhật người dùng thành công" },
+        { status: 200 }
+      );
     } else {
-      console.error("Lỗi không xác định khi cập nhật người dùng:", error);
+      return NextResponse.json(
+        { message: "Không thể cập nhật người dùng" },
+        { status: 400 }
+      );
     }
-
+  } catch (error: unknown) {
+    console.error(
+      "Lỗi cập nhật người dùng:",
+      error instanceof Error ? error.message : error
+    );
     return NextResponse.json(
       { message: "Lỗi máy chủ nội bộ" },
       { status: 500 }

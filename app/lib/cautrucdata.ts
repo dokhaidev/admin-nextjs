@@ -43,3 +43,12 @@ export interface IUser {
   vai_tro: number; // 0: user, 1: admin
   khoa: number; // 0: hoạt động, 1: bị khóa
 }
+
+export interface IOrder {
+  id_dh: number;
+  ho_ten: string;
+  email: string;
+  thoi_diem_mua: string;
+  status: number;
+  ghi_chu: string;
+}

@@ -2,14 +2,12 @@ import { LoaiModel } from "@/app/lib/models";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-type RouteContext = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(request: NextRequest, context: RouteContext) {
-  const { id } = context.params;
+// GET
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
   const loai = await LoaiModel.findByPk(id);
   if (!loai) {
     return NextResponse.json({ thong_bao: "Không tìm thấy" }, { status: 404 });
@@ -17,8 +15,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
   return NextResponse.json(loai);
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  const { id } = context.params;
+// DELETE
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
   const loai = await LoaiModel.findByPk(id);
   if (!loai) {
     return NextResponse.json({ thong_bao: "Không tìm thấy" }, { status: 404 });
@@ -27,14 +29,18 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   return NextResponse.redirect(new URL("/loai", request.url));
 }
 
-export async function PUT(request: NextRequest, context: RouteContext) {
+// PUT
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const formData = await request.formData();
     const ten_loai = formData.get("ten_loai") as string;
     const thu_tu = Number(formData.get("thu_tu"));
     const an_hien = formData.get("an_hien") === "1";
 
-    const { id } = context.params;
+    const { id } = params;
     const loai = await LoaiModel.findByPk(id);
     if (!loai) {
       return NextResponse.json(
@@ -50,14 +56,18 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   }
 }
 
-export async function POST(request: NextRequest, context: RouteContext) {
+// POST (có thể không cần thiết cho route `[id]`)
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const formData = await request.formData();
     const ten_loai = formData.get("ten_loai") as string;
     const thu_tu = Number(formData.get("thu_tu"));
     const an_hien = formData.get("an_hien") === "1";
 
-    const { id } = context.params;
+    const { id } = params;
     const loai = await LoaiModel.findByPk(id);
     if (!loai) {
       return NextResponse.json(

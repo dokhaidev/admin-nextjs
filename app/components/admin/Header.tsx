@@ -15,11 +15,11 @@ export default function Header({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [userName, setUserName] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0); // State lưu trữ số lượng thông báo
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    // Chỉ thực thi sau khi client đã mount
     setIsMounted(true);
     const user = localStorage.getItem("user");
     if (user) {
@@ -35,8 +35,18 @@ export default function Header({
     }
   }, []);
 
-  // Không render gì khi chưa mount hoặc đang ở trang login
-  if (!isMounted || pathname === "/login") return null;
+  useEffect(() => {
+    const storedNotificationCount = localStorage.getItem("notificationCount");
+    if (storedNotificationCount) {
+      setNotificationCount(Number(storedNotificationCount));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (notificationCount > 0) {
+      localStorage.setItem("notificationCount", String(notificationCount));
+    }
+  }, [notificationCount]);
 
   const handleLogout = async () => {
     try {
@@ -49,6 +59,28 @@ export default function Header({
       console.error("Logout error:", err);
     }
   };
+
+  // Remove unused handleAction function and error parameter
+  // const handleAction = async (action: string) => {
+  //   // Cập nhật thông báo khi admin thực hiện hành động
+  //   setNotificationCount((prevCount) => prevCount + 1);
+
+  //   try {
+  //     if (action === "add") {
+  //       // Gọi API thêm dữ liệu...
+  //     } else if (action === "edit") {
+  //       // Gọi API chỉnh sửa dữ liệu...
+  //     } else if (action === "delete") {
+  //       // Gọi API xóa dữ liệu...
+  //     }
+  //     toast.success(`${action} thành công!`);
+  //   } catch (error) {
+  //     toast.error(`Lỗi khi ${action}!`);
+  //   }
+  // };
+
+  // Không render gì khi chưa mount hoặc đang ở trang login
+  if (!isMounted || pathname === "/login") return null;
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-30">
@@ -69,7 +101,6 @@ export default function Header({
 
       {/* Right section - Search and profile */}
       <div className="flex items-center space-x-4">
-        {/* Search bar */}
         <div className="relative hidden md:block">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FiSearch className="text-gray-400" />
@@ -87,7 +118,9 @@ export default function Header({
         <div className="flex items-center space-x-3">
           <button className="p-2 rounded-full hover:bg-gray-100 relative">
             <FiBell className="text-xl text-gray-600" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+            {notificationCount > 0 && (
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+            )}
           </button>
           <button className="p-2 rounded-full hover:bg-gray-100">
             <FiSettings className="text-xl text-gray-600" />

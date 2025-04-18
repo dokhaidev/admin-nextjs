@@ -40,7 +40,7 @@ export default function RootLayout({
       </head>
 
       <body className="bg-gray-50 text-gray-900 antialiased">
-        {/* Client-side components */}
+        {/* Client-side layout */}
         <ClientLayout>{children}</ClientLayout>
 
         {/* Toast notifications */}

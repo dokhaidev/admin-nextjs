@@ -1,40 +1,76 @@
 import { SanPhamModel } from "@/app/lib/models";
 import { NextResponse } from "next/server";
+import { Op, WhereOptions, Order } from "sequelize";
 
 export async function POST(req: Request) {
-  const formData = await req.formData();
-  // Extract data from the form
-  const ten_sp = formData.get("ten_sp") as string;
-  const gia = Number(formData.get("gia"));
-  const gia_km = Number(formData.get("gia_km"));
-  const hinh = formData.get("hinh") as string;
-  const ngay = formData.get("ngay") as string;
-  const id_loai = Number(formData.get("id_loai"));
-  const an_hien = formData.get("an_hien") === "1";
-  const hot = formData.get("hot") === "1";
+  try {
+    const formData = await req.formData();
 
-  await SanPhamModel.create({
-    ten_sp,
-    gia,
-    gia_km,
-    hinh,
-    ngay,
-    id_loai,
-    an_hien,
-    hot,
-  });
-  return NextResponse.redirect(new URL("/san-pham", req.url));
+    const ten_sp = formData.get("ten_sp") as string;
+    const gia = Number(formData.get("gia"));
+    const gia_km = Number(formData.get("gia_km"));
+    const hinh = formData.get("hinh") as string;
+    const ngay = formData.get("ngay") as string;
+    const id_loai = Number(formData.get("id_loai"));
+    const an_hien = formData.get("an_hien") === "1";
+    const hot = formData.get("hot") === "1";
+
+    await SanPhamModel.create({
+      ten_sp,
+      gia,
+      gia_km,
+      hinh,
+      ngay,
+      id_loai,
+      an_hien,
+      hot,
+    });
+
+    return NextResponse.redirect(new URL("/san-pham", req.url));
+  } catch (error) {
+    console.error("Lỗi thêm sản phẩm:", error);
+    return NextResponse.json(
+      { error: "Không thể thêm sản phẩm" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET(req: Request) {
   try {
-    // Lấy tham số phân trang từ URL
     const { searchParams } = new URL(req.url);
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+    const sort = searchParams.get("sort") || "macdinh";
+    const trangthai = searchParams.get("trangthai");
+    const hot = searchParams.get("hot");
     const offset = (page - 1) * limit;
 
-    // Sử dụng findAndCountAll để lấy cả dữ liệu và tổng số bản ghi
+    const where: WhereOptions = {};
+
+    if (search) {
+      where.ten_sp = {
+        [Op.like]: `%${search}%`,
+      };
+    }
+
+    if (trangthai !== null && trangthai !== undefined) {
+      where.an_hien = trangthai === "1";
+    }
+
+    if (hot !== null && hot !== undefined) {
+      where.hot = hot === "1";
+    }
+
+    let order: Order = [["id", "desc"]];
+
+    if (sort === "caonhat") {
+      order = [["gia", "DESC"]];
+    } else if (sort === "thapnhat") {
+      order = [["gia", "ASC"]];
+    }
+
     const { count, rows } = await SanPhamModel.findAndCountAll({
       attributes: [
         "id",
@@ -47,18 +83,18 @@ export async function GET(req: Request) {
         "an_hien",
         "hot",
       ],
-      order: [["id", "desc"]],
-      limit: limit,
-      offset: offset,
+      where,
+      order,
+      limit,
+      offset,
     });
 
-    // Tính toán tổng số trang
     const totalPages = Math.ceil(count / limit);
 
     return NextResponse.json({
       data: rows,
       totalItems: count,
-      totalPages: totalPages,
+      totalPages,
       currentPage: page,
       itemsPerPage: limit,
     });

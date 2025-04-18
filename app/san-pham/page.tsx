@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { ISanPham } from "../lib/cautrucdata";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,11 +13,13 @@ import {
   FiTrendingUp,
   FiChevronLeft,
   FiChevronRight,
+  FiSearch,
+  FiFilter,
+  FiX,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 export default function ProductList() {
-  const router = useRouter();
   const [danhSachSP, setDanhSachSP] = useState<ISanPham[]>([]);
   const [dangTai, setDangTai] = useState(true);
   const [loi, setLoi] = useState<string | null>(null);
@@ -26,12 +27,41 @@ export default function ProductList() {
   const [tongSoTrang, setTongSoTrang] = useState(1);
   const [soSanPhamTrenTrang] = useState(10);
 
+  // State cho bộ lọc và tìm kiếm
+  const [tuKhoaTimKiem, setTuKhoaTimKiem] = useState("");
+  const [sapXep, setSapXep] = useState<"macdinh" | "caonhat" | "thapnhat">(
+    "macdinh"
+  );
+  const [locTrangThai, setLocTrangThai] = useState<"tatca" | "hienthi" | "an">(
+    "tatca"
+  );
+  const [locHot, setLocHot] = useState<"tatca" | "hot" | "binhthuong">("tatca");
+  const [hienThiBoLoc, setHienThiBoLoc] = useState(false);
+
   useEffect(() => {
     const taiDuLieu = async () => {
       try {
-        const url = `${
+        let url = `${
           process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3003"
         }/api/san-pham?page=${trangHienTai}&limit=${soSanPhamTrenTrang}`;
+
+        // Thêm các tham số tìm kiếm và lọc
+        if (tuKhoaTimKiem) {
+          url += `&search=${encodeURIComponent(tuKhoaTimKiem)}`;
+        }
+
+        if (sapXep !== "macdinh") {
+          url += `&sort=${sapXep}`;
+        }
+
+        if (locTrangThai !== "tatca") {
+          url += `&trangthai=${locTrangThai === "hienthi" ? "1" : "0"}`;
+        }
+
+        if (locHot !== "tatca") {
+          url += `&hot=${locHot === "hot" ? "1" : "0"}`;
+        }
+
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -50,7 +80,14 @@ export default function ProductList() {
       }
     };
     taiDuLieu();
-  }, [trangHienTai, soSanPhamTrenTrang]);
+  }, [
+    trangHienTai,
+    soSanPhamTrenTrang,
+    tuKhoaTimKiem,
+    sapXep,
+    locTrangThai,
+    locHot,
+  ]);
 
   const handleDeleteSuccess = (deletedId: number) => {
     setDanhSachSP((prev) => prev.filter((sp) => sp.id !== deletedId));
@@ -61,6 +98,14 @@ export default function ProductList() {
     if (trangMoi >= 1 && trangMoi <= tongSoTrang) {
       setTrangHienTai(trangMoi);
     }
+  };
+
+  const resetBoLoc = () => {
+    setTuKhoaTimKiem("");
+    setSapXep("macdinh");
+    setLocTrangThai("tatca");
+    setLocHot("tatca");
+    setTrangHienTai(1);
   };
 
   if (dangTai) {
@@ -93,6 +138,116 @@ export default function ProductList() {
         </Link>
       </div>
 
+      {/* Thanh tìm kiếm và bộ lọc */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          {/* Tìm kiếm */}
+          <div className="flex-1 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiSearch className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Tìm kiếm sản phẩm..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={tuKhoaTimKiem}
+              onChange={(e) => {
+                setTuKhoaTimKiem(e.target.value);
+                setTrangHienTai(1);
+              }}
+            />
+          </div>
+
+          {/* Nút bộ lọc */}
+          <button
+            onClick={() => setHienThiBoLoc(!hienThiBoLoc)}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FiFilter size={16} />
+            Bộ lọc
+          </button>
+        </div>
+
+        {/* Panel bộ lọc */}
+        {hienThiBoLoc && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Sắp xếp */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sắp xếp theo giá
+                </label>
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  value={sapXep}
+                  onChange={(e) => {
+                    setSapXep(
+                      e.target.value as "macdinh" | "caonhat" | "thapnhat"
+                    );
+                    setTrangHienTai(1);
+                  }}
+                >
+                  <option value="macdinh">Mặc định</option>
+                  <option value="thapnhat">Giá thấp nhất</option>
+                  <option value="caonhat">Giá cao nhất</option>
+                </select>
+              </div>
+
+              {/* Lọc trạng thái */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Trạng thái
+                </label>
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  value={locTrangThai}
+                  onChange={(e) => {
+                    setLocTrangThai(
+                      e.target.value as "tatca" | "hienthi" | "an"
+                    );
+                    setTrangHienTai(1);
+                  }}
+                >
+                  <option value="tatca">Tất cả</option>
+                  <option value="hienthi">Hiển thị</option>
+                  <option value="an">Đang ẩn</option>
+                </select>
+              </div>
+
+              {/* Lọc sản phẩm hot */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sản phẩm hot
+                </label>
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  value={locHot}
+                  onChange={(e) => {
+                    setLocHot(e.target.value as "tatca" | "hot" | "binhthuong");
+                    setTrangHienTai(1);
+                  }}
+                >
+                  <option value="tatca">Tất cả</option>
+                  <option value="hot">Hot</option>
+                  <option value="binhthuong">Bình thường</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-4 text-right">
+              <button
+                onClick={resetBoLoc}
+                className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-800"
+              >
+                <FiX className="mr-2" size={16} />
+                Xóa bộ lọc
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Danh sách sản phẩm */}
       <div className="border rounded-lg overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full bg-white">

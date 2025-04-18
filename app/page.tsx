@@ -1,8 +1,6 @@
 "use client";
 import {
   FaBox,
-  FaUsers,
-  FaShoppingCart,
   FaChartLine,
   FaList,
   FaEye,
@@ -13,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 // Component LoadingSpinner
 function LoadingSpinner() {
@@ -76,7 +73,6 @@ function StatCard({
 // Main Dashboard
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  // const router = useRouter();
   const [stats, setStats] = useState({
     categories: { total: 0, visible: 0, hidden: 0 },
     products: { total: 0, visible: 0, hidden: 0, hot: 0 },
@@ -94,6 +90,8 @@ export default function Dashboard() {
           fetch("/api/loai/thongke"),
           fetch("/api/san-pham/thongke"),
           fetch("/api/tin-tuc/thongke"),
+          fetch("/api/users/thongke"),
+          fetch("/api/orders/thongke"),
         ]);
 
         const [categoryData, productData, newsData] = await Promise.all([
@@ -257,22 +255,22 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatCard
           title="Người dùng"
           value={stats.users}
           icon={<FaUsers className="text-yellow-500" />}
-          link="/nguoi-dung"
+          link="/users"
           trend="+12.5%"
         />
         <StatCard
           title="Đơn hàng"
           value={stats.orders}
           icon={<FaShoppingCart className="text-teal-500" />}
-          link="/don-hang"
+          link="/orders"
           trend="+8.3%"
         />
-      </div>
+      </div> */}
     </div>
   );
 }

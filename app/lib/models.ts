@@ -63,17 +63,104 @@ export const TinTucModel = db.define(
 export const UserModel = db.define(
   "users",
   {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    email: { type: DataTypes.STRING, allowNull: false, unique: true },
-    mat_khau: { type: DataTypes.STRING, allowNull: false },
-    ho_ten: { type: DataTypes.STRING, allowNull: false },
-    vai_tro: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }, // 1: admin, 0: user
-    khoa: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }, // 1: khóa, 0: hoạt động
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    mat_khau: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    ho_ten: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vai_tro: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0, // 1: admin, 0: user
+    },
+    khoa: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0, // 1: khóa, 0: hoạt động
+    },
+    // Thêm các trường khác nếu cần
     // remember_token: { type: DataTypes.STRING, allowNull: true },
     // email_verified_at: { type: DataTypes.DATE, allowNull: true },
   },
   {
     tableName: "users",
+    timestamps: false, // Tắt timestamps nếu không có trường createdAt, updatedAt
+  }
+);
+
+export const DonHangModel = db.define(
+  "don_hang",
+  {
+    id_dh: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    ho_ten: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    thoi_diem_mua: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    status: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    ghi_chu: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "don_hang",
+    timestamps: false,
+  }
+);
+
+export const DonHangChiTietModel = db.define(
+  "don_hang_chi_tiet",
+  {
+    id_ct: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    id_dh: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    id_sp: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    so_luong: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: "don_hang_chi_tiet",
     timestamps: false,
   }
 );
